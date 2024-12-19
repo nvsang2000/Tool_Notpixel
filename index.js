@@ -14,7 +14,7 @@ const {
 
 (async () => {
   try {
-    const dataSets = ["data_user"];
+    const dataSets = ["data_user_1"];
     const bypassTele = path.join(__dirname, "./telewebtoadrv2");
 
     for (const dataSet of dataSets) {
@@ -132,6 +132,9 @@ async function handleDivs(page, startTime) {
     while (true) {
       const currentUrl = page.url();
       const elapsedTime = (Date.now() - startTime) / 1000;
+
+      const model = await page.$('div._close_container_gb8eq_23');
+      if(model) await waitAndClickCloseDiv(page)
 
       if (elapsedTime >= 300) {
         console.log("Hết thời gian session, refesh lại page!");
