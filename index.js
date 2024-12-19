@@ -44,7 +44,6 @@ const {
   }
 })();
 
-
 async function goNotPixel(browser) {
   const startTime = Date.now();
 
@@ -56,8 +55,8 @@ async function goNotPixel(browser) {
       return await goNotPixel(browser); // Gọi lại từ đầu
     }
 
+    const page = await browser.newPage();
     try {
-      const page = await browser.newPage();
       await page.goto(`https://web.telegram.org/a/#7249432100`, {
         waitUntil: "networkidle2",
       });
@@ -70,6 +69,8 @@ async function goNotPixel(browser) {
       console.error("Lỗi trong goNotPixel, đợi 20s, thực hiện lại...");
       await setDelay(20000);
       return await goNotPixel(browser); // Thử lại từ đầu
+    } finally {
+      await page.close();
     }
   }
 }
@@ -163,8 +164,14 @@ async function handleDivs(page, startTime) {
 
           if (singleNumber > 0) {
             await setDelay(2000);
-            await div.click();
+
+            const boundingBox = await div.boundingBox();
+            const randomX = boundingBox.x + Math.random() * boundingBox.width;
+            const randomY = boundingBox.y + Math.random() * boundingBox.height;
+
+            await page.mouse.click(randomX, randomY);
             console.log(`Đã click vào div "${divText}"`);
+            console.log(`Tọa độ (${randomX}, ${randomY})`);
             await setDelay(2000);
           } else {
             console.log("Không tìm thấy số trong chuỗi.");
@@ -186,7 +193,6 @@ async function handleDivs(page, startTime) {
     await handleDivs(page, startTime);
   }
 }
-
 
 async function autoClickButtonPaint(params) {
   if (!targetButton) {
