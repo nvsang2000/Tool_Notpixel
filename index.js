@@ -8,6 +8,8 @@ const {
   handleCanvasClick,
   clickButton,
   handleButtons,
+  getRandomNumber,
+  randomDelay,
 } = require("./helper");
 
 (async () => {
@@ -133,7 +135,7 @@ async function handleDivs(page, startTime) {
 
       if (elapsedTime >= 300) {
         console.log("Hết thời gian session, refesh lại page!");
-        return; // Thoát hàm `handleDivs` để quay lại `goNotPixel`
+        return;
       }
 
       if (!arrayUrl.includes(currentUrl)) {
@@ -144,7 +146,7 @@ async function handleDivs(page, startTime) {
       }
 
       const divs = await page.$$('div[style="opacity: 1;"]');
-      await setDelay(4000);
+      await randomDelay(4,8)
 
       for (let i = 0; i < divs.length; i++) {
         const div = divs[i];
@@ -157,13 +159,11 @@ async function handleDivs(page, startTime) {
         );
 
         if (isMatch) {
-          console.log(`Div ${i + 1}: "${divText}" chứa từ khóa.`);
-
           const match = divText.match(/\d+/);
           const singleNumber = match ? parseInt(match[0], 10) : 0;
 
           if (singleNumber > 0) {
-            await setDelay(2000);
+            await randomDelay(4,8)
 
             const boundingBox = await div.boundingBox();
             const randomX = boundingBox.x + Math.random() * boundingBox.width;
@@ -172,7 +172,7 @@ async function handleDivs(page, startTime) {
             await page.mouse.click(randomX, randomY);
             console.log(`Đã click vào div "${divText}"`);
             console.log(`Tọa độ (${randomX}, ${randomY})`);
-            await setDelay(2000);
+            await randomDelay(4,8);
           } else {
             console.log("Không tìm thấy số trong chuỗi.");
           }
@@ -181,7 +181,8 @@ async function handleDivs(page, startTime) {
         }
       }
 
-      for (let seconds = 65; seconds > 0; seconds--) {
+      const numNext = getRandomNumber(60, 90)
+      for (let seconds = numNext; seconds > 0; seconds--) {
         process.stdout.write(`\rĐếm ngược: ${seconds}s`);
         await setDelay(1000);
       }
@@ -196,7 +197,6 @@ async function handleDivs(page, startTime) {
 
 async function autoClickButtonPaint(params) {
   if (!targetButton) {
-    // Tìm và click vào button có class "_button_wekpw_2" và img src chứa đoạn string cụ thể
     const buttonClicked = await page.evaluate(() => {
       const buttons = Array.from(
         document.querySelectorAll("button._button_wekpw_2")
@@ -221,10 +221,9 @@ async function autoClickButtonPaint(params) {
       console.log("Không tìm thấy button có class");
     }
 
-    // Cập nhật phạm vi tọa độ tại đây
     const xRange = { min: 50, max: 150 };
     const yRange = { min: 50, max: 150 };
-    const targetColor = "rgb(255, 150, 0)"; // Màu bạn muốn kiểm tra
+    const targetColor = "rgb(255, 150, 0)";
     await handleCanvasClick(page, canvasHandle, xRange, yRange, targetColor);
   }
   await handleButtons(page, ["Paint", "paint"]);

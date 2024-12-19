@@ -328,6 +328,15 @@ async function openPageAndLogin(browser, site) {
   }
 }
 
+function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function randomDelay(min, max) {
+  const delay = getRandomNumber(min, max) * 1000; // Convert to milliseconds
+  await setDelay(delay);
+}
+
 module.exports = {
   updateRequestID,
   saveToJSON,
@@ -340,4 +349,6 @@ module.exports = {
   handleCanvasClick,
   openPageAndLogin,
   handleButtons,
+  getRandomNumber,
+  randomDelay
 };
